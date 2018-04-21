@@ -1,11 +1,11 @@
 import React, { Component } from 'react'
-import { TweenMax, Elastic } from 'gsap'
+import { TimelineMax, Elastic, Sine } from 'gsap'
 import './index.css'
 
 export default class AnimatingState extends Component {
 
   state = {
-    value: 'Change me!'
+    value: 'Change me below!'
   }
 
   dom = {
@@ -19,22 +19,26 @@ export default class AnimatingState extends Component {
 
   componentDidUpdate () {
     if (this.state.value) {
-      const splitText = new window.SplitText(this.dom.text.current, {lineClass: 'AnimatingState__text-line++'})
+      const splitText = new window.SplitText(this.dom.text.current)
       const lastChar = splitText.chars[splitText.chars.length - 1]
-     
-      // resize font size to keep in single line
 
-      // get position of the last char to perform some sort of decorative animation
-
-      TweenMax.from(lastChar, 0.4, { scale: 0, css: { color: 'red' },  ease: Elastic.easeOut })
+      this.timeline = new TimelineMax()
+      this.timeline
+        .set(lastChar, { scale: 0 })
+        .to(lastChar, 0.2, { scale: 2,  ease: Sine.easeOut })
+        .to(lastChar, 0.4, { scale: 1,  ease: Elastic.easeOut })
     }
+  }
+
+  componentWillUnmount () {
+    if (this.timeline) this.timeline.kill()
   }
 
   render () {
     return (
       <div className='AnimatingState'>
         <div className='AnimatingState__text' ref={this.dom.text}>{this.state.value}</div>
-        <input className='AnimatingState__input' type='text' value={this.state.value} onChange={this.handleChange} maxLength='80' />
+        <input className='AnimatingState__input' type='text' value={this.state.value} onChange={this.handleChange} />
       </div>
     )
   }
